@@ -96,6 +96,7 @@
     <h1 id="title">Открываем приложение…</h1>
     <p id="hint">Если телефон спросит, открыть ли приложение, — разрешите, а в приложении подтвердите добавление.</p>
     <p id="warm" hidden>Откройте <span class="app"></span> с экрана «Домой» и дождитесь, пока он загрузится. Затем вернитесь сюда и нажмите кнопку, а в приложении подтвердите добавление. Если приложение закрыто, добавление зависнет на бесконечной загрузке.</p>
+    <p id="apphint" hidden></p>
     <a class="open" id="open" href="#">Открыть</a>
     <ol>
       <li id="install">Ничего не произошло — <a id="store" href="#">установите <span class="app"></span></a> и откройте его один раз.</li>
@@ -152,7 +153,12 @@
         appStore: "https://apps.apple.com/app/onexray/id6745748773",
         play: "https://play.google.com/store/apps/details?id=net.yuandev.onexray",
         pkg: "net.yuandev.onexray",
-        warmStart: true
+        warmStart: true,
+        // Лимит устройств панель считает по x-hwid, а OneXray шлёт его,
+        // только если включить это у подписки: ссылкой включить нельзя,
+        // /sub/add других параметров не принимает. Без него панель
+        // ответит на подписку 404.
+        hint: "В форме добавления включите переключатель «HWID» — без него подписка не загрузится."
       },
       {
         // Только подписка и только Android: из российского App Store
@@ -238,6 +244,11 @@
     } else {
       document.getElementById("title").textContent = "Открываем " + app.name + "…";
       open.textContent = "Открыть " + app.name;
+    }
+    if (app.hint) {
+      var hint = document.getElementById("apphint");
+      hint.textContent = app.hint;
+      hint.hidden = false;
     }
     if (store) {
       document.getElementById("store").href = store;
