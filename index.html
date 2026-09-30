@@ -20,7 +20,7 @@
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:">
 <meta name="robots" content="noindex">
-<title>Добавить конфиг</title>
+<title>Добавить в приложение</title>
 <style>
   :root {
     --bg: #f4f5f7;
@@ -99,17 +99,17 @@
     <a class="open" id="open" href="#">Открыть</a>
     <ol>
       <li id="install">Ничего не произошло — <a id="store" href="#">установите <span class="app"></span></a> и откройте его один раз.</li>
-      <li id="nostore" hidden><span class="app"></span> на Android нет в Google Play. Не открылось — нажмите в боте «➕ OneXray» или «➕ v2RayTun (Android)».</li>
-      <li>Вернитесь в бот и нажмите кнопку под конфигом ещё раз.</li>
+      <li id="nostore" hidden><span class="app"></span> на Android нет в Google Play. Не открылось — выберите в боте OneXray или v2RayTun.</li>
+      <li>Вернитесь в бот и нажмите кнопку ещё раз.</li>
     </ol>
   </section>
   <section id="android-only" hidden>
     <h1><span class="app"></span> — только для Android</h1>
-    <p>На iPhone и Mac нажмите в боте «➕ Karing» или «➕ OneXray» под тем же конфигом.</p>
+    <p>На iPhone и Mac добавьте через Karing или OneXray — кнопки для них есть в боте рядом с этой.</p>
   </section>
   <section id="bad" hidden>
     <h1>Ссылка не подошла</h1>
-    <p>Вернитесь в бот и нажмите кнопку под конфигом ещё раз. Если не помогло — скопируйте конфиг из сообщения и добавьте его в приложении вручную.</p>
+    <p>Вернитесь в бот и нажмите кнопку ещё раз. Если не помогло — скопируйте ссылку или конфиг из сообщения и добавьте в приложении вручную.</p>
   </section>
 </main>
 <script>
@@ -142,6 +142,27 @@
         // добавлении (проверено на iPhone 2026-09-30); запущенный — нет.
         // Поэтому сам не открываем: сначала человек запускает приложение.
         warmStart: true
+      },
+      {
+        // Подписка в OneXray. То же приложение — то же зависание на
+        // холодном старте, поэтому так же просим сначала его запустить.
+        prefix: "onexray://onexray.com/sub/add?",
+        scheme: "onexray",
+        name: "OneXray",
+        appStore: "https://apps.apple.com/app/onexray/id6745748773",
+        play: "https://play.google.com/store/apps/details?id=net.yuandev.onexray",
+        pkg: "net.yuandev.onexray",
+        warmStart: true
+      },
+      {
+        // Только подписка и только Android: из российского App Store
+        // Happ снят.
+        prefix: "happ://add/",
+        scheme: "happ",
+        name: "Happ",
+        appStore: null,
+        play: "https://play.google.com/store/apps/details?id=com.happproxy",
+        pkg: "com.happproxy"
       },
       {
         prefix: "v2raytun://import/",
