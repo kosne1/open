@@ -1,0 +1,226 @@
+<!doctype html>
+<!--
+  Страница-переходник для кнопок «➕ Karing / OneXray / v2RayTun» в боте.
+
+  Telegram пропускает в кнопки только http(s) и tg, поэтому бот даёт ссылку
+  сюда, а deep link приложения кладёт во фрагмент адреса (#…). Фрагмент
+  браузер на сервер не отправляет: конфиг не попадает ни в логи хостинга,
+  ни в Referer. Страница ничего не грузит извне и никуда не ходит — только
+  открывает приложение.
+
+  Открывает она лишь схемы Karing, OneXray и v2RayTun из списка ниже:
+  иначе любой мог бы прислать ссылку на эту страницу, ведущую куда угодно.
+
+  Публикация — DEPLOY.md, раздел «Кнопки импорта без домена».
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:">
+<meta name="robots" content="noindex">
+<title>Добавить конфиг</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #16181d;
+    --muted: #5d6470;
+    --accent: #2f6fed;
+    --accent-text: #ffffff;
+    --border: #e1e4ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111317;
+      --card: #1b1e24;
+      --text: #eceef2;
+      --muted: #9aa1ad;
+      --accent: #5b8cff;
+      --accent-text: #0b0d10;
+      --border: #2b2f37;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111317;
+    --card: #1b1e24;
+    --text: #eceef2;
+    --muted: #9aa1ad;
+    --accent: #5b8cff;
+    --accent-text: #0b0d10;
+    --border: #2b2f37;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+  }
+  h1 { margin: 0 0 8px; font-size: 22px; line-height: 1.3; }
+  p { margin: 0 0 16px; color: var(--muted); }
+  .open {
+    display: block;
+    margin: 24px 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+  ol { margin: 0; padding-left: 20px; color: var(--muted); }
+  li + li { margin-top: 6px; }
+  a { color: var(--accent); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <section id="ok" hidden>
+    <h1 id="title">Открываем приложение…</h1>
+    <p>Если телефон спросит, открыть ли приложение, — разрешите, а в приложении подтвердите добавление.</p>
+    <a class="open" id="open" href="#">Открыть</a>
+    <ol>
+      <li id="install">Ничего не произошло — <a id="store" href="#">установите <span class="app"></span></a> и откройте его один раз.</li>
+      <li id="nostore" hidden><span class="app"></span> на Android нет в Google Play. Не открылось — нажмите в боте «➕ OneXray» или «➕ v2RayTun (Android)».</li>
+      <li>Вернитесь в бот и нажмите кнопку под конфигом ещё раз.</li>
+    </ol>
+  </section>
+  <section id="android-only" hidden>
+    <h1><span class="app"></span> — только для Android</h1>
+    <p>На iPhone и Mac нажмите в боте «➕ Karing» или «➕ OneXray» под тем же конфигом.</p>
+  </section>
+  <section id="bad" hidden>
+    <h1>Ссылка не подошла</h1>
+    <p>Вернитесь в бот и нажмите кнопку под конфигом ещё раз. Если не помогло — скопируйте конфиг из сообщения и добавьте его в приложении вручную.</p>
+  </section>
+</main>
+<script>
+  // Смена одного фрагмента страницу не перезагружает. Если браузер
+  // Telegram переиспользует вкладку, вторая кнопка открыла бы первый конфиг.
+  window.addEventListener("hashchange", function () {
+    location.reload();
+  });
+
+  (function () {
+    // Сверяем начало ссылки, а не «содержит». appStore / play = null —
+    // на этой платформе приложения нет в официальном сторе.
+    var APPS = [
+      {
+        prefix: "karing://install-config?",
+        scheme: "karing",
+        name: "Karing",
+        appStore: "https://apps.apple.com/app/karing/id6472431552",
+        play: null,
+        pkg: null
+      },
+      {
+        prefix: "onexray://onexray.com/config/add?",
+        scheme: "onexray",
+        name: "OneXray",
+        appStore: "https://apps.apple.com/app/onexray/id6745748773",
+        play: "https://play.google.com/store/apps/details?id=net.yuandev.onexray",
+        pkg: "net.yuandev.onexray"
+      },
+      {
+        prefix: "v2raytun://import/",
+        scheme: "v2raytun",
+        name: "v2RayTun",
+        appStore: null,
+        play: "https://play.google.com/store/apps/details?id=com.v2raytun.android",
+        pkg: "com.v2raytun.android"
+      }
+    ];
+
+    function show(id) {
+      document.getElementById(id).hidden = false;
+    }
+
+    var link = "";
+    try {
+      link = decodeURIComponent(location.hash.slice(1));
+    } catch (e) {
+      link = "";
+    }
+    var app = null;
+    for (var i = 0; i < APPS.length; i++) {
+      if (link.indexOf(APPS[i].prefix) === 0) {
+        app = APPS[i];
+        break;
+      }
+    }
+
+    if (!app) {
+      show("bad");
+      return;
+    }
+
+    // Конфиг — ключ доступа. Убираем его из адресной строки и истории
+    // браузера: кнопка «Открыть» уже держит ссылку у себя.
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch (e) {}
+
+    var names = document.querySelectorAll(".app");
+    for (var j = 0; j < names.length; j++) names[j].textContent = app.name;
+
+    var android = /Android/i.test(navigator.userAgent);
+    var store = android ? app.play : app.appStore;
+
+    if (!android && !app.appStore) {
+      show("android-only");
+      return;
+    }
+
+    // На Android — intent:// с пакетом и запасным адресом: приложения нет,
+    // и Chrome сам откроет его страницу в Google Play. Android отделяет
+    // блок #Intent по последней «#», так что фрагмент самой ссылки
+    // (имя сервера) остаётся в данных для приложения.
+    var target = link;
+    if (android && app.pkg) {
+      target =
+        "intent://" + link.slice(app.scheme.length + 3) +
+        "#Intent;scheme=" + app.scheme +
+        ";package=" + app.pkg +
+        ";S.browser_fallback_url=" + encodeURIComponent(app.play) +
+        ";end";
+    }
+
+    document.getElementById("title").textContent = "Открываем " + app.name + "…";
+    var open = document.getElementById("open");
+    open.href = target;
+    open.textContent = "Открыть " + app.name;
+    if (store) {
+      document.getElementById("store").href = store;
+    } else {
+      document.getElementById("install").hidden = true;
+      show("nostore");
+    }
+    show("ok");
+
+    // Сразу после загрузки: Safari покажет «Открыть в …», Chrome откроет
+    // приложение или Google Play. Кнопка остаётся на случай, когда браузер
+    // переход без нажатия не пропустил.
+    setTimeout(function () {
+      location.href = target;
+    }, 300);
+  })();
+</script>
+</body>
+</html>
